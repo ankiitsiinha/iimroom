@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Room Allotment</title>
+</head>
+<body>
+    <h1>Room Allotment</h1>
+    <form method="POST">
+        <label for="name">Participant Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="gender">Gender:</label><br>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select><br><br>
+
+        <label for="registration_id">Registration ID:</label><br>
+        <input type="text" id="registration_id" name="registration_id" required><br><br>
+
+        <label for="contact_number">Contact Number:</label><br>
+        <input type="text" id="contact_number" name="contact_number" required><br><br>
+
+        <input type="submit" value="Assign Room">
+    </form>
+
+    {% if result %}
+    <h3>{{ result }}</h3>
+    {% endif %}
+
+    <form method="GET" action="/allotted_rooms">
+        <input type="submit" value="View Allotted Rooms">
+    </form>
+</body>
+</html>
+

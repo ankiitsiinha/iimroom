@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Allotted Rooms</title>
+</head>
+<body>
+    <h1>Allotted Rooms</h1>
+    {% if participants %}
+    <table>
+        <tr>
+            <th>Participant Name</th>
+            <th>Room Number</th>
+            <th>Bed</th>
+            <th>Block</th>
+            <th>Registration ID</th>
+            <th>Contact Number</th>
+        </tr>
+        {% for participant, details in participants.items() %}
+        <tr>
+            <td>{{ participant }}</td>
+            <td>{{ details[0] }}</td>
+            <td>{{ details[1] }}</td>
+            <td>{{ details[2] }}</td>
+            <td>{{ details[3] }}</td>
+            <td>{{ details[4] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No rooms have been allotted yet.</p>
+    {% endif %}
+</body>
+</html>
