@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Room Allotment</title>
+  <link rel="stylesheet" type="text/css" href="/styles/style.css">
+</head>
+<body>
+  <h1>Room Allotment</h1>
+  <form id="roomAssignForm" action="/assign-room" method="POST">
+    <label for="registration_id">Registration ID:</label>
+    <input type="text" id="registration_id" name="registration_id" required>
+    <br>
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender" required>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+    <br>
+    <input type="submit" value="Assign Room">
+  </form>
+  
+  <div id="result"></div>
+
+  <script src="/scripts/script.js"></script>
+</body>
+</html>
+

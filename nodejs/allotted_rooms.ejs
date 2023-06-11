@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Allotted Rooms</title>
+  <link rel="stylesheet" type="text/css" href="/styles/style.css">
+</head>
+<body>
+  <h1>Allotted Rooms</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Registration ID</th>
+        <th>Block</th>
+        <th>Room Number</th>
+        <th>Bed</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% participants.forEach(function(participant) { %>
+        <tr>
+          <td><%= participant.registrationId %></td>
+          <td><%= participant.block %></td>
+          <td><%= participant.number %></td>
+          <td><%= participant.bed %></td>
+          <td>
+            <form class="clear-allotment-form" action="/clear-allotment" method="POST">
+              <input type="hidden" name="registration_id" value="<%= participant.registrationId %>">
+              <button type="submit">Clear Allotment</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  
+  <script src="/scripts/script.js"></script>
+</body>
+</html>
+

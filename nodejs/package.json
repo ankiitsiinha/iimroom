@@ -1,0 +1,16 @@
+{
+  "name": "room-allotment-app",
+  "version": "1.0.0",
+  "description": "Room allotment application",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+    // Other dependencies required by your application
+  }
+}
+
