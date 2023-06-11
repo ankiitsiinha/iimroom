@@ -2,32 +2,106 @@
 <html>
 <head>
     <title>Allotted Rooms</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: auto;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .filter-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .filter-label {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Allotted Rooms</h1>
-    {% if participants %}
+    <div class="filter-container">
+        <label class="filter-label" for="block-filter">Filter by Block:</label>
+        <select id="block-filter">
+            <option value="">All</option>
+            <optgroup label="Male Blocks">
+                {% for block in male_blocks %}
+                    <option value="{{ block }}">{{ block }}</option>
+                {% endfor %}
+            </optgroup>
+            <optgroup label="Female Blocks">
+                {% for block in female_blocks %}
+                    <option value="{{ block }}">{{ block }}</option>
+                {% endfor %}
+            </optgroup>
+        </select>
+    </div>
     <table>
         <tr>
-            <th>Participant Name</th>
+            <th>Registration ID</th>
+            <th>Gender</th>
+            <th>Block</th>
             <th>Room Number</th>
             <th>Bed</th>
-            <th>Block</th>
-            <th>Registration ID</th>
-            <th>Contact Number</th>
+            <th>Action</th>
         </tr>
-        {% for participant, details in participants.items() %}
-        <tr>
-            <td>{{ participant }}</td>
-            <td>{{ details[0] }}</td>
-            <td>{{ details[1] }}</td>
-            <td>{{ details[2] }}</td>
-            <td>{{ details[3] }}</td>
-            <td>{{ details[4] }}</td>
-        </tr>
+        {% for registration_id, details in participants.items() %}
+            <tr data-block="{{ details[3] }}">
+                <td>{{ registration_id }}</td>
+                <td>{{ details[4] }}</td>
+                <td>{{ details[3] }}</td>
+                <td>{{ details[1] }}</td>
+                <td>{{ details[2] }}</td>
+                <td>
+                    <form method="POST" action="/allotted_rooms">
+                        <input type="hidden" name="registration_id" value="{{ registration_id }}">
+                        <button type="submit">Clear Allotment</button>
+                    </form>
+                </td>
+            </tr>
         {% endfor %}
     </table>
-    {% else %}
-    <p>No rooms have been allotted yet.</p>
-    {% endif %}
+    <div class="center">
+        <button onclick="location.href='/'">Back to Assignment</button>
+    </div>
+    <br>
+    <p class="center">Developed by Infrastructure & IT Committee</p>
+
+    <script>
+        var maleBlocks = {{ male_blocks }};
+        var femaleBlocks = {{ female_blocks }};
+
+        document.getElementById('block-filter').addEventListener('change', function() {
+            var selectedBlock = this.value;
+            var rows = document.getElementsByTagName('tr');
+            for (var i = 1; i < rows.length; i++) {
+                var row = rows[i];
+                var block = row.getAttribute('data-block');
+                if (selectedBlock === '' || (maleBlocks.includes(block) && selectedBlock === 'male') || (femaleBlocks.includes(block) && selectedBlock === 'female')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+

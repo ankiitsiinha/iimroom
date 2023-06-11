@@ -1,36 +1,233 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Room Allotment</title>
+    <title>Hostel Room Allocation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f2f2f2;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .form-field label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-field input,
+        .form-field select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-field select {
+            width: 100%;
+        }
+
+        .form-field button {
+            padding: 8px 16px;
+            background-color: lightgreen;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .form-field button:hover {
+            background-color: darkgreen;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            margin-top: 10px;
+            background-color: lightgreen;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: darkgreen;
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: lightblue;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .link-button:hover {
+            background-color: darkblue;
+        }
+
+        .bottom-right {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+    </style>
+    <script>
+        function openModal() {
+            document.getElementById("overlay").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        function updateBlocks() {
+            const gender = document.getElementById("manual_gender").value;
+            const blockSelect = document.getElementById("manual_block");
+            blockSelect.innerHTML = "";
+
+            if (gender === "male") {
+                const maleBlocks = ['A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B4'];
+                maleBlocks.forEach((block) => {
+                    const option = document.createElement("option");
+                    option.value = block;
+                    option.text = block;
+                    blockSelect.appendChild(option);
+                });
+            } else if (gender === "female") {
+                const femaleBlocks = ['B3', 'C1', 'C2', 'C3'];
+                femaleBlocks.forEach((block) => {
+                    const option = document.createElement("option");
+                    option.value = block;
+                    option.text = block;
+                    blockSelect.appendChild(option);
+                });
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Room Allotment</h1>
-    <form method="POST">
-        <label for="name">Participant Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <div class="container">
+        <img src="https://www.iimkashipur.ac.in/sites/all/themes/cmf/images/iim-kashipur-logo.png" alt="IIM Kashipur Logo" style="width: 150px; margin: 0 auto;">
+        <h1>Hostel Room Allocation</h1>
+        <form method="POST" action="/">
+            <div class="form-field">
+                <label for="registration_id">Registration ID:</label>
+                <input type="text" name="registration_id" id="registration_id" required>
+            </div>
+            <div class="form-field">
+                <label for="gender">Gender:</label>
+                <select name="gender" id="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <input type="submit" value="Assign Room" class="link-button">
+            </div>
+        </form>
+        <br>
+        <button onclick="openModal()" class="link-button">Manual Allotment</button>
+        <br>
+        <a href="/allotted_rooms" class="link-button">View Allotted Rooms</a>
+    </div>
 
-        <label for="gender">Gender:</label><br>
-        <select id="gender" name="gender" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select><br><br>
-
-        <label for="registration_id">Registration ID:</label><br>
-        <input type="text" id="registration_id" name="registration_id" required><br><br>
-
-        <label for="contact_number">Contact Number:</label><br>
-        <input type="text" id="contact_number" name="contact_number" required><br><br>
-
-        <input type="submit" value="Assign Room">
-    </form>
-
-    {% if result %}
-    <h3>{{ result }}</h3>
-    {% endif %}
-
-    <form method="GET" action="/allotted_rooms">
-        <input type="submit" value="View Allotted Rooms">
-    </form>
+    <!-- Manual Allotment Modal -->
+    <div id="overlay" class="modal">
+        <div class="modal-content">
+            <h2>Manual Allotment</h2>
+            <form method="POST" action="/manual_allotment">
+                <div class="form-field">
+                    <label for="manual_registration_id">Registration ID:</label>
+                    <input type="text" name="manual_registration_id" id="manual_registration_id" required>
+                </div>
+                <div class="form-field">
+                    <label for="manual_gender">Gender:</label>
+                    <select name="manual_gender" id="manual_gender" onchange="updateBlocks()" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="manual_block">Block:</label>
+                    <select name="manual_block" id="manual_block" required>
+                        <!-- Options will be populated dynamically based on gender selection -->
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="manual_room">Room Number:</label>
+                    <input type="text" name="manual_room" id="manual_room" required>
+                </div>
+                <div class="form-field">
+                    <label for="manual_bed">Bed:</label>
+                    <input type="text" name="manual_bed" id="manual_bed" required>
+                </div>
+                <div class="form-field">
+                    <button type="submit">Submit</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
 

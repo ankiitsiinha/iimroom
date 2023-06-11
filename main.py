@@ -1,15 +1,18 @@
-####
+##
 import csv
 import random
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
+
 
 app = Flask(__name__)
 
-def assign_room(participant_name, gender, registration_id, contact_number):
+def assign_room(registration_id, gender):
     global current_block_index
+
     # Check if the participant has already been assigned a room
-    if participant_name in participants:
-        return f"{participant_name} has already been assigned a room."
+    for details in participants.values():
+        if details[0] == registration_id:
+            return f"Registration ID {registration_id} has already been assigned a room."
 
     # Assign the block and rooms based on gender
     if gender.lower() == 'male':
@@ -19,23 +22,23 @@ def assign_room(participant_name, gender, registration_id, contact_number):
         blocks = female_blocks
         available_rooms = female_rooms[current_block_index]
     else:
-        return f"Invalid gender specified for {participant_name}."
+        return f"Invalid gender specified for Registration ID {registration_id}."
 
     # Check if there are available rooms in the current block
     if len(available_rooms) == 0:
         current_block_index += 1
         if current_block_index >= len(blocks):
-            return f"No rooms available in any blocks for {participant_name}."
+            return f"No rooms available in any blocks for Registration ID {registration_id}."
         else:
             available_rooms = male_rooms[current_block_index] if gender.lower() == 'male' else female_rooms[current_block_index]
-    
+
     # Randomly select a room
     room = random.choice(available_rooms)
     room_number, bed = room[0], room[1]
 
     # Assign the block and add to the participants list
     block = blocks[current_block_index]
-    participants[participant_name] = [room_number, bed, block, registration_id, contact_number]
+    participants[registration_id] = [registration_id, room_number, bed, block, gender]
 
     # Remove the assigned room from the available rooms
     available_rooms.remove(room)
@@ -44,11 +47,11 @@ def assign_room(participant_name, gender, registration_id, contact_number):
     if len(available_rooms) == 0:
         current_block_index += 1
         if current_block_index >= len(blocks):
-            return f"{participant_name} has been assigned Room {room_number}{bed} in Block {block}. All blocks are fully assigned."
+            return f"Registration ID {registration_id} has been assigned Room {room_number}{bed} in Block {block}. All blocks are fully assigned."
         else:
-            return f"{participant_name} has been assigned Room {room_number}{bed} in Block {block}. Moving to the next block: {blocks[current_block_index]}."
+            return f"Registration ID {registration_id} has been assigned Room {room_number}{bed} in Block {block}. Moving to the next block: {blocks[current_block_index]}."
 
-    return f"{participant_name} has been assigned Room {room_number}{bed} in Block {block}."
+    return f"Registration ID {registration_id} has been assigned Room {room_number}{bed} in Block {block}."
 
 
 # Define the blocks and rooms array
@@ -87,12 +90,10 @@ current_block_index = 0
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        participant_name = request.form['name']
-        gender = request.form['gender']
         registration_id = request.form['registration_id']
-        contact_number = request.form['contact_number']
+        gender = request.form['gender']
         
-        result = assign_room(participant_name, gender, registration_id, contact_number)
+        result = assign_room(registration_id, gender)
         return render_template('index.html', result=result)
     
     return render_template('index.html')
@@ -101,14 +102,47 @@ def home():
 def save_participants_to_csv():
     with open('participants.csv', 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Participant Name', 'Room Number', 'Bed', 'Block', 'Registration ID', 'Contact Number'])
-        for participant, details in participants.items():
-            writer.writerow([participant, details[0], details[1], details[2], details[3], details[4]])
-## to view participants
-@app.route('/allotted_rooms')
+        writer.writerow(['Registration ID', 'Room Number', 'Bed', 'Block', 'Gender'])
+        for details in participants.values():
+            writer.writerow(details)
+
+@app.route('/allotted_rooms', methods=['GET', 'POST'])
 def allotted_rooms():
+    if request.method == 'POST':
+        registration_id = request.form['registration_id']
+        if registration_id in participants:
+            del participants[registration_id]
+            save_participants_to_csv()
+        return render_template('allotted_rooms.html', participants=participants)
     return render_template('allotted_rooms.html', participants=participants)
 
+@app.route('/allotted_rooms', methods=['POST'])
+def clear_allotment():
+    registration_id = request.form['registration_id']
+    if registration_id in participants:
+        del participants[registration_id]
+        save_participants_to_csv()
+    return render_template('allotted_rooms.html', participants=participants)
+
+@app.route('/manual_allotment', methods=['POST'])
+def manual_allotment():
+    registration_id = request.form['manual_registration_id']
+    gender = request.form['manual_gender']
+    block = request.form['manual_block']
+    room_number = request.form['manual_room']
+    bed = request.form['manual_bed']
+
+    # Check if the participant has already been assigned a room
+    if registration_id in participants:
+        return f"Registration ID {registration_id} has already been assigned a room."
+
+    # Assign the block and add to the participants list
+    participants[registration_id] = [registration_id, room_number, bed, block, gender]
+
+    # Save the participants list to CSV
+    save_participants_to_csv()
+
+    return redirect('/allotted_rooms')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
